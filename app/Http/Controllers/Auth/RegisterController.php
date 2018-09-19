@@ -20,7 +20,7 @@ class RegisterController extends Controller
     |
     */
 
-    use RegistersUsers;
+    use RegistersUsers; // ユーザーを新規で作るときにかならず必要！
 
     /**
      * Where to redirect users after registration.
