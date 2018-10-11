@@ -4,6 +4,7 @@ namespace App;
 
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Foundation\Auth\User as Authenticatable;
+use App\Micropost;
 
 class User extends Authenticatable
 {
@@ -86,5 +87,38 @@ class User extends Authenticatable
         return Micropost::whereIn('user_id', $follow_user_ids);
     }
     
-
+    public function favorites(){
+        return $this->belongsToMany('App\Micropost', 'user_favorite', 'user_id', 'favorite_id')->withTimestamps();
+    }
+    
+    public function is_favorite($micropostId){
+        return $this->favorites()->where('favorite_id', $micropostId)->exists();
+        
+    }
+    
+    public function favorite($micropostId){
+        // 既にお気に入りに入れているかの確認
+        $exist = $this->is_favorite($micropostId);
+        
+        if($exist){
+            // 既に存在している場合は何もしない
+            return false;
+        } else {
+            // お気に入りに入れていない場合は入れる
+            $this->favorites()->attach($micropostId);
+            return true;
+        }
+        
+    }
+    
+    public function unfavorite($micropostId){
+        $exist = $this->is_favorite($micropostId);
+        
+        if($exist){
+            $this->favorites()->detach($micropostId);
+            return true;
+        } else {
+            return false;
+        }
+    }
 }
